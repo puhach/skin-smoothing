@@ -26,7 +26,7 @@ find_package( OpenCV REQUIRED )
 
 include_directories( ${OpenCV_INCLUDE_DIRS})
 
-add_executable(skinsoft main.cpp)
+add_executable(skinsoft main.cpp imagefilter.h imagefilter.cpp skinsmoother.h skinsmoother.cpp facialskinsmoother.h facialskinsmoother.cpp)
 target_link_libraries(skinsoft ${OpenCV_LIBS} )
   
 if(MSVC)
