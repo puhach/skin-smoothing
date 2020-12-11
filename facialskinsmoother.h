@@ -1,9 +1,9 @@
 #ifndef FACIALSKINSMOOTHER_H
 #define FACIALSKINSMOOTHER_H
 
-#include "imagefilter.h"
+#include "skinsmoother.h"
 
-class FacialSkinSmoother : public ImageFilter
+class FacialSkinSmoother : public SkinSmoother
 {
 public:
 	FacialSkinSmoother() = default;
