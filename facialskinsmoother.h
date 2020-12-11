@@ -9,7 +9,7 @@
 class FacialSkinSmoother : public SkinSmoother
 {
 public:
-	FacialSkinSmoother();
+	FacialSkinSmoother(float confidenceThreshold);
 	// TODO: implement copy/move constructors
 
 	virtual cv::Mat apply(const cv::Mat& image) override;
@@ -18,6 +18,7 @@ private:
 	//static const cv::String weightFile, configFile;
 
 	cv::dnn::Net net;
+	float confidenceThreshold;
 };	// FacialSkinSmoother
 
 

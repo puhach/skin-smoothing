@@ -3,12 +3,13 @@
 #include <opencv2/dnn.hpp>
 
 #include <iostream>		// !TEST!
+#include <opencv2/highgui.hpp>	// TEST!
 
 
 
-
-FacialSkinSmoother::FacialSkinSmoother()
+FacialSkinSmoother::FacialSkinSmoother(float confidenceThreshold)
 	: net(cv::dnn::readNetFromTensorflow("./models/opencv_face_detector_uint8.pb", "./models/opencv_face_detector.pbtxt"))
+	, confidenceThreshold(confidenceThreshold)
 {
 
 }
@@ -30,8 +31,25 @@ cv::Mat FacialSkinSmoother::apply(const cv::Mat& image)
 	detection = detection.reshape(1, detection.size[2]);
 	CV_Assert(detection.dims == 2);
 
-	std::cout << detection.size << std::endl;
+	//std::cout << detection.size << std::endl;
 	std::cout << detection << std::endl;
+
+	for (int i = 0; i < detection.rows; ++i)
+	{
+		float conf = detection.at<float>(i, 2);
+
+		if (conf > this->confidenceThreshold)
+		{
+			int x1 = static_cast<int>(detection.at<float>(i, 3) * image.cols);
+			int y1 = static_cast<int>(detection.at<float>(i, 4) * image.rows);
+			int x2 = static_cast<int>(detection.at<float>(i, 5) * image.cols);
+			int y2 = static_cast<int>(detection.at<float>(i, 6) * image.rows);
+
+			cv::Mat face = image(cv::Range(y1, y2), cv::Range(x1, x2));
+			cv::imshow("test", face);
+			cv::waitKey();
+		}
+	}	// i
 
 	cv::Mat out;
 	return out;
