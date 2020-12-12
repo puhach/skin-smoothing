@@ -12,6 +12,8 @@ public:
 	FacialSkinSmoother(float confidenceThreshold);
 	// TODO: implement copy/move constructors
 
+	virtual void applyInPlace(cv::Mat &image) override;
+
 	virtual cv::Mat apply(const cv::Mat& image) override;
 
 private:

@@ -6,6 +6,9 @@
 class SkinSmoother : public ImageFilter
 {
 public:
+
+	virtual void applyInPlace(cv::Mat& image) override;
+
 	virtual cv::Mat apply(const cv::Mat& image) override;
 };	// SkinSmoother
 
