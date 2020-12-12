@@ -1,10 +1,19 @@
 #include "skinsmoother.h"
 
 #include <opencv2/imgproc.hpp>
-
+#include <iostream>	// TEST!
 
 void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 {
+	// If you use cvtColor with 8-bit images, the conversion will have some information lost. For many applications, this will not be noticeable 
+	// but it is recommended to use 32-bit images in applications that need the full range of colors or that convert an image before an operation 
+	// and then convert back.
+	// https://docs.opencv.org/4.2.0/d8/d01/group__imgproc__color__conversions.html#ga397ae87e1288a81d2363b61574eb8cab
+	cv::Mat imageHSVF;
+	image.convertTo(imageHSVF, CV_32F, 1.0 / 255);
+	cv::cvtColor(imageHSVF, imageHSVF, cv::COLOR_BGR2HSV);
+	std::cout << imageHSVF << std::endl;
+
 	// TODO: implement skin smoothing
 
 	cv::blur(image, image, cv::Size(3, 3));

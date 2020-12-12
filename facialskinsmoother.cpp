@@ -49,8 +49,8 @@ void FacialSkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 			cv::Mat face = image(cv::Range(y1, y2), cv::Range(x1, x2));
 			//cv::imshow("test", face);
 			//cv::waitKey();
-			//SkinSmoother::apply(face);
-			cv::blur(face, face, cv::Size(3, 3));
+			SkinSmoother::applyInPlace(face);
+			//cv::blur(face, face, cv::Size(3, 3));
 		}
 	}	// i
 
