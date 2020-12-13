@@ -88,7 +88,28 @@ void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 	cv::imshow("test", tmp);
 	cv::waitKey();*/
 
+	cv::Mat imageBlurredHSVF;
+	//cv::GaussianBlur(imageHSVF, imageBlurredHSVF, cv::Size(5,5), 0, 0);
+	cv::bilateralFilter(imageHSVF, imageBlurredHSVF, 5, 80, 80);
 
+	cv::Mat tmp; 
+	cv::cvtColor(imageBlurredHSVF, tmp, cv::COLOR_HSV2BGR);
+	cv::imshow("test", tmp);
+	cv::waitKey();
+
+	cv::Mat imageBlurredBGR;
+	imageBlurredHSVF.copyTo(imageHSVF, mask);
+	cv::cvtColor(imageHSVF, imageBlurredBGR, cv::COLOR_HSV2BGR);
+	imageBlurredBGR.convertTo(image, CV_8UC3, 255.0);
+	//imageBlurredBGR.copyTo(image);
+
+	/*cv::Mat imageBlurredBGR;
+	cv::cvtColor(imageBlurredHSVF, imageBlurredBGR, cv::COLOR_HSV2BGR);
+	imageBlurredBGR.convertTo(imageBlurredBGR, CV_8UC3, 255.0);
+	imageBlurredBGR.copyTo(image, mask);*/
+
+	cv::imshow("blurred", image);
+	cv::waitKey(0);
 }
 
 cv::Mat SkinSmoother::apply(const cv::Mat& image)	// virtual
