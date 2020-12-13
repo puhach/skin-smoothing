@@ -3,12 +3,20 @@
 
 #include "imagefilter.h"
 
+enum class SkinDetectionHeuristic
+{
+	MeanColor,
+	DominantColor,
+	SelectiveSampling
+};
+
 class SkinSmoother : public ImageFilter
 {
 public:
 
-	SkinSmoother(int blurRadius, double sigmaColor, double sigmaSpace)
-		: blurRadius(blurRadius)
+	SkinSmoother(SkinDetectionHeuristic heuristic, int blurRadius, double sigmaColor, double sigmaSpace)
+		: heuristic(heuristic)
+		, blurRadius(blurRadius)
 		, sigmaColor(sigmaColor)
 		, sigmaSpace(sigmaSpace)
 	{}
@@ -19,8 +27,9 @@ public:
 
 private:
 
-	cv::Mat createSkinMask(const cv::Mat &imHSV, double lowerHue, double upperHue, double lowerSat, double upperSat);
+	cv::Mat createSkinMask(const cv::Mat &imHSVF, double lowerHue, double upperHue, double lowerSat, double upperSat);
 
+	SkinDetectionHeuristic heuristic;
 	int blurRadius;
 	double sigmaColor, sigmaSpace;
 };	// SkinSmoother
