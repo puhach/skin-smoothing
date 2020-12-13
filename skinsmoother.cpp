@@ -7,6 +7,9 @@
 
 void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 {
+	//cv::imshow("face", image);
+	//cv::waitKey();
+
 	// If you use cvtColor with 8-bit images, the conversion will have some information lost. For many applications, this will not be noticeable 
 	// but it is recommended to use 32-bit images in applications that need the full range of colors or that convert an image before an operation 
 	// and then convert back.
@@ -21,22 +24,22 @@ void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 	{
 	case SkinDetectionHeuristic::MeanColor:
 		{
-			// The mean color heuristic
+			// The mean color heuristic detects the skin by calculating the mean color of the face region
 
 			cv::Scalar meanColor, stdDev;
 			cv::meanStdDev(imageF, meanColor, stdDev);
 
 			mask = createSkinMask(imageF, meanColor[0] - stdDev[0], meanColor[0] + stdDev[0], meanColor[1] - stdDev[1], meanColor[1] + stdDev[1]);
 
-			cv::imshow("mask", mask);
-			cv::waitKey();
+			//cv::imshow("mask", mask);
+			//cv::waitKey();
 		}
 
 		break;
 
 	case SkinDetectionHeuristic::DominantColor:
 		{
-			// The dominant color heuristic
+			// The dominant color heuristic detects the skin by finding the dominant hue and saturation values in the face region
 
 			// Compute the 2D histogram of hue-saturation pairs
 			cv::Mat histHueSat;
@@ -69,38 +72,26 @@ void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 
 			// Create a skin region mask
 			mask = createSkinMask(imageF, dominantHue - meanDev[0], dominantHue + meanDev[0], dominantSat - meanDev[1], dominantSat + meanDev[1]);
-
-			/*cv::Scalar lowerHSV = { dominantHue-meanDev[0], dominantSat-meanDev[1], 0 }
-				, upperHSV = { dominantHue+meanDev[0], dominantSat + meanDev[1], 1 };*/
-
-				//cv::Mat mask, orMask;
-				//cv::inRange(imageF, lowerHSV, upperHSV, mask);
-
-				//// Account for hue values wrapping around 360 degrees
-				//if (lowerHSV[0] < 0 && upperHSV[0] < hueRange[1])
-				//{
-				//	lowerHSV[0] = lowerHSV[0] + hueRange[1];
-				//	upperHSV[0] = hueRange[1];
-				//	cv::inRange(imageF, lowerHSV, upperHSV, orMask);
-				//	cv::bitwise_or(mask, orMask, mask);
-				//}
-				//else if (lowerHSV[0] > 0 && upperHSV[0] > hueRange[1])
-				//{
-				//	lowerHSV[0] = 0;
-				//	upperHSV[0] = upperHSV[0] - hueRange[1];
-				//	cv::inRange(imageF, lowerHSV, upperHSV, orMask);
-				//	cv::bitwise_or(mask, orMask, mask);
-				//}
 		}
 
+		break;
+
+	case SkinDetectionHeuristic::SelectiveSampling:
+		mask = detectSkinBySampling(imageF);
+		cv::morphologyEx(mask, mask, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3)));	// denoise the mask
+		//cv::dilate(mask, mask, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3)));	// denoise the mask
+		cv::imshow("mask", mask);
+		cv::waitKey();
 		break;
 
 	default:
 		throw std::runtime_error("The heuristic is not implemented.");
 	}	// heuristic
 
-	// Denoise the mask	
+	// Smooth the mask		
 	cv::GaussianBlur(mask, mask, cv::Size(7, 7), 0, 0);
+	cv::imshow("mask", mask);
+	cv::waitKey();
 	//cv::morphologyEx(mask, mask, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3)));
 
 	mask.convertTo(mask, CV_32F, 1 / 255.0);
@@ -137,6 +128,69 @@ cv::Mat SkinSmoother::apply(const cv::Mat& image)	// virtual
 	cv::Mat imageCopy = image.clone();
 	SkinSmoother::applyInPlace(imageCopy);
 	return imageCopy;
+}
+
+cv::Mat SkinSmoother::detectSkinBySampling(const cv::Mat& faceHSVF)
+{
+	CV_Assert(faceHSVF.depth() == CV_32F);
+
+	/*cv::Mat face = imHSVF.clone();
+	cv::rectangle(face, cv::Rect(int(0.2 * face.cols), 0.1*face.rows, 0.6 * face.cols, 0.2 * face.rows), cv::Scalar(0, 255, 0), 1);
+	
+	cv::rectangle(face, cv::Rect(0.1*face.cols, 0.5*face.rows, 0.2*face.cols, 0.2*face.rows), cv::Scalar(255,0,0), 1);
+	cv::rectangle(face, cv::Rect(0.7 * face.cols, 0.5 * face.rows, 0.2 * face.cols, 0.2 * face.rows), cv::Scalar(255, 0, 0), 1);
+
+	cv::rectangle(face, cv::Rect(0.4 * face.cols, 0.85 * face.rows, 0.2 * face.cols, 0.15 * face.rows), cv::Scalar(0, 0, 255), 1);*/
+
+	// Face proportions have been found on the web and adjusted by experimentation
+	cv::Mat forehead = faceHSVF({ static_cast<int>(0.1*faceHSVF.rows), static_cast<int>(0.3*faceHSVF.rows) }
+		, { static_cast<int>(0.2*faceHSVF.cols), static_cast<int>(0.8*faceHSVF.cols) });
+
+	cv::Mat leftCheek = faceHSVF({ static_cast<int>(0.5 * faceHSVF.rows), static_cast<int>(0.7 * faceHSVF.rows) } 
+		, { static_cast<int>(0.1 * faceHSVF.cols), static_cast<int>(0.3 * faceHSVF.cols) });
+
+	cv::Mat rightCheek = faceHSVF({ static_cast<int>(0.5*faceHSVF.rows), static_cast<int>(0.7*faceHSVF.rows) }
+		, { static_cast<int>(0.7*faceHSVF.cols), static_cast<int>(0.9*faceHSVF.cols) });
+
+	cv::Mat chin = faceHSVF({ static_cast<int>(0.85*faceHSVF.rows), static_cast<int>(1.0*faceHSVF.rows) }
+		, { static_cast<int>(0.4*faceHSVF.cols), static_cast<int>(0.6*faceHSVF.cols) });
+
+
+	std::vector<cv::Mat> samples{ forehead, leftCheek, rightCheek, chin };
+
+	cv::Scalar meanHSV, devHSV;
+	int n = 0;
+	for (const cv::Mat& sample : samples)
+	{
+		if (!sample.empty())
+		{
+			cv::Scalar mu, sigma;
+			cv::meanStdDev(sample, mu, sigma);
+
+			meanHSV += mu;
+
+			// Maximal deviation seems to work better than the average one, probably because these regions tend to have low variance in general
+			//devHSV += sigma;
+			devHSV[0] = cv::max(devHSV[0], sigma[0]);
+			devHSV[1] = cv::max(devHSV[1], sigma[1]);
+
+			++n;
+		}
+	}
+
+	if (n > 0)
+	{
+		// Average the results from non-empty samples
+		meanHSV /= n;
+		//devHSV /= n;
+	}
+	else
+	{
+		// In case all sample regions were empty, fall back to finding the mean color over the entire face 
+		cv::meanStdDev(faceHSVF, meanHSV, devHSV);
+	}
+
+	return createSkinMask(faceHSVF, meanHSV[0]-devHSV[0], meanHSV[0]+devHSV[0], meanHSV[1]-devHSV[1], meanHSV[1]+devHSV[1]);	
 }
 
 cv::Mat SkinSmoother::createSkinMask(const cv::Mat &imHSVF, double lowerHue, double upperHue, double lowerSat, double upperSat)

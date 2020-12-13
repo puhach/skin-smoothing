@@ -27,6 +27,8 @@ public:
 
 private:
 
+	cv::Mat detectSkinBySampling(const cv::Mat &faceHSVF);
+
 	cv::Mat createSkinMask(const cv::Mat &imHSVF, double lowerHue, double upperHue, double lowerSat, double upperSat);
 
 	SkinDetectionHeuristic heuristic;
