@@ -18,6 +18,9 @@ public:
 	virtual cv::Mat apply(const cv::Mat& image) override;
 
 private:
+
+	cv::Mat createSkinMask(const cv::Mat &imHSV, double lowerHue, double upperHue, double lowerSat, double upperSat);
+
 	int blurRadius;
 	double sigmaColor, sigmaSpace;
 };	// SkinSmoother
