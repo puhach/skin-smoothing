@@ -27,6 +27,8 @@ public:
 
 private:
 
+	cv::Mat detectSkinByMeanColor(const cv::Mat &faceHSVF);
+	cv::Mat detectSkinByDominantColor(const cv::Mat &faceHSVF);
 	cv::Mat detectSkinBySampling(const cv::Mat &faceHSVF);
 
 	cv::Mat createSkinMask(const cv::Mat &imHSVF, double lowerHue, double upperHue, double lowerSat, double upperSat);

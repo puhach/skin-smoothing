@@ -10,15 +10,14 @@ class FacialSkinSmoother : public SkinSmoother
 {
 public:
 	FacialSkinSmoother(float faceConfThreshold, SkinDetectionHeuristic heuristic, int blurRadius=3, double sigmaColor=30.0, double sigmaSpace=30.0);
-	// TODO: implement copy/move constructors
+	//FacialSkinSmoother(const FacialSkinSmoother& other) = default;
+	//FacialSkinSmoother(FacialSkinSmoother&& other) = default;
 
 	virtual void applyInPlace(cv::Mat &image) override;
 
 	virtual cv::Mat apply(const cv::Mat& image) override;
 
 private:
-	//static const cv::String weightFile, configFile;
-
 	cv::dnn::Net net;
 	float confidenceThreshold;
 };	// FacialSkinSmoother

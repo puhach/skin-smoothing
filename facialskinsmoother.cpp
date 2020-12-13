@@ -2,9 +2,6 @@
 
 #include <opencv2/dnn.hpp>
 
-#include <iostream>		// !TEST!
-#include <opencv2/highgui.hpp>	// TEST!
-#include <opencv2/imgproc.hpp> // TEST!
 
 
 FacialSkinSmoother::FacialSkinSmoother(float faceConfThreshold, SkinDetectionHeuristic heuristic, int blurRadius, double sigmaColor, double sigmaSpace)
@@ -32,9 +29,6 @@ void FacialSkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 	detection = detection.reshape(1, detection.size[2]);
 	CV_Assert(detection.dims == 2);
 
-	//std::cout << detection.size << std::endl;
-	//std::cout << detection << std::endl;
-
 	for (int i = 0; i < detection.rows; ++i)
 	{
 		float conf = detection.at<float>(i, 2);
@@ -48,10 +42,8 @@ void FacialSkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 			CV_Assert(x2 > x1 && y2 > y1);
 
 			cv::Mat face = image(cv::Range(y1, y2), cv::Range(x1, x2));
-			//cv::imshow("test", face);
-			//cv::waitKey();
-			SkinSmoother::applyInPlace(face);
-			//cv::blur(face, face, cv::Size(3, 3));
+
+			SkinSmoother::applyInPlace(face);	// call the inherited method
 		}
 	}	// i
 
