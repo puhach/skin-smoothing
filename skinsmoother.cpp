@@ -55,15 +55,40 @@ void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 	cv::Scalar lowerHSV = { dominantHue-meanDev[0], dominantSat-meanDev[1], 0 }
 		, upperHSV = { dominantHue+meanDev[0], dominantSat + meanDev[1], 255 };
 
-	cv::Mat mask;
+	cv::Mat mask, orMask;
 	cv::inRange(imageHSVF, lowerHSV, upperHSV, mask);
 
-	cv::imshow("test", mask);
+	// Account for hue values wrapping around 360 degrees
+	if (lowerHSV[0] < 0 && upperHSV[0] < hueRange[1])
+	{
+		lowerHSV[0] = lowerHSV[0] + hueRange[1];
+		upperHSV[0] = hueRange[1];
+		cv::inRange(imageHSVF, lowerHSV, upperHSV, orMask);
+		cv::bitwise_or(mask, orMask, mask);
+	}
+	else if (lowerHSV[0] > 0 && upperHSV[0] > hueRange[1])
+	{
+		lowerHSV[0] = 0;
+		upperHSV[0] = upperHSV[0] - hueRange[1];
+		cv::inRange(imageHSVF, lowerHSV, upperHSV, orMask);
+		cv::bitwise_or(mask, orMask, mask);
+	}
+
+	// Denoise the mask
+	///cv::dilate(mask, mask, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3)));
+	//cv::morphologyEx(mask, mask, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3)));
+
+	cv::GaussianBlur(mask, mask, cv::Size(5, 5), 0, 0);
+
+	cv::imshow("mask", mask);
 	cv::waitKey(0);
 
-	// TODO: implement skin smoothing
+	/*cv::Mat tmp;
+	cv::cvtColor(imageHSVF, tmp, cv::COLOR_HSV2BGR);
+	cv::imshow("test", tmp);
+	cv::waitKey();*/
 
-	cv::blur(image, image, cv::Size(3, 3));
+
 }
 
 cv::Mat SkinSmoother::apply(const cv::Mat& image)	// virtual
