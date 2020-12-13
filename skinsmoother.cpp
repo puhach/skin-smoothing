@@ -18,6 +18,7 @@ void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 	/*cv::Mat imageHSV;
 	cv::cvtColor(image, imageHSV, cv::COLOR_BGR2HSV);*/
 
+	// Compute the 2D histogram of hue-saturation pairs
 	cv::Mat hist;
 	int channels[] = { 0, 1 };
 	int histSize[] = { 360, 256 }; 
@@ -26,56 +27,39 @@ void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 	//const float hueRange[] = { 0, 180 }, satRange[] = { 0, 256 }, * ranges[] = { hueRange, satRange };
 	cv::calcHist(&imageHSVF, 1, channels, cv::Mat(), hist, 2, histSize, ranges, true, false);
 	//cv::calcHist(&imageHSV, 1, channels, cv::Mat(), hist, 2, histSize, ranges, true, false);
+		
+	// Reduce the 2D hue-saturation histogram to find the dominant hue.
+	// It looks like skin color tends to have rather high variance in the saturation channel, therefore if we consider hue-saturation pairs, 
+	// we are likely to pick a pair which belongs to some constant color area of the background or clothes. To overcome this difficulty,
+	// we are finding the dominant saturation among pixels having the dominant hue.
+	cv::Mat histHue;
+	cv::reduce(hist, histHue, 1, cv::REDUCE_SUM, -1);
 	
-	cv::Mat hueHist;
-	cv::reduce(hist, hueHist, 1, cv::REDUCE_SUM, -1);
-	
+	// Find the dominant hue from the hue histogram
 	cv::Point loc;
-	double maxVal;
-	cv::minMaxLoc(hueHist, nullptr, &maxVal, nullptr, &loc);
+	double maxVal;		// TODO: remove it
+	cv::minMaxLoc(histHue, nullptr, &maxVal, nullptr, &loc);
 	//int dominantHue = loc.y;
 	float dominantHue = hueRange[1] * loc.y / histSize[0];
 
-	//std::cout << hist.row(dominantHue) << std::endl;
-	cv::minMaxLoc(hist.row(dominantHue), nullptr, &maxVal, nullptr, &loc);
+	// Find the dominant saturation among pixels having the dominant hue
+	cv::minMaxLoc(hist.row(loc.y), nullptr, &maxVal, nullptr, &loc);
 	//int dominantSat = loc.x;
 	float dominantSat = satRange[1] * loc.x / histSize[1];
 
-	//cv::Mat hist;
-	//int channels[] = { 0 };
-	//int histSize[] = { 180 };
-	////const float hueRange[] = { 0, 180 }, satRange[] = { 0, 256 }, *ranges[] = { hueRange, satRange };
-	//const float hueRange[] = { 0, 180 };
-	//const float* ranges[] = { hueRange };
-	//cv::calcHist(&imageHSV, 1, channels, cv::Mat(), hist, 1, histSize, ranges, true, false);
+	// Find how much on average the face color differs from the dominant color (we are interested in hue and saturation only)
+	cv::Mat devMat;
+	cv::absdiff(imageHSVF, cv::Scalar(dominantHue, dominantSat), devMat);
+	cv::Scalar meanDev = cv::mean(devMat);
 
-	//// Find the dominant hue
-	//double maxVal;
-	////cv::minMaxLoc(hist, nullptr, &maxVal, nullptr, &maxLoc);
-	////int dominantColor[2];
-	//int dominantHue;
-	//cv::minMaxIdx(hist, nullptr, &maxVal, nullptr, &dominantHue);
+	cv::Scalar lowerHSV = { dominantHue-meanDev[0], dominantSat-meanDev[1], 0 }
+		, upperHSV = { dominantHue+meanDev[0], dominantSat + meanDev[1], 255 };
 
-	//cv::Mat imageHSVChannels[3];
-	//cv::split(imageHSV, imageHSVChannels);
+	cv::Mat mask;
+	cv::inRange(imageHSVF, lowerHSV, upperHSV, mask);
 
-	//cv::Mat mask = imageHSVChannels[0] == dominantHue;
-
-	//channels[0] = 1;
-	//histSize[0] = 256;
-	//float satRange[] = { 0, 256 };
-	//ranges[0] = satRange;
-	//cv::calcHist(&imageHSV, 1, channels, mask, hist, 1, histSize, ranges, true, false);
-
-	//int dominantSat;
-	//cv::minMaxIdx(hist, nullptr, &maxVal, nullptr, &dominantSat);
-
-	/*cv::Scalar mu = cv::mean(imageHSV);
-	dominantColor[0] = int(mu[0]);
-	dominantColor[1] = int(mu[1]);
-
-	cv::Scalar lowerHSV = { dominantColor[0]-30.0, dominantColor[1] - 30.0, 0 }
-			, upperHSV = { dominantColor[0]+30.0, dominantColor[1] + 30.0, 255 };*/
+	cv::imshow("test", mask);
+	cv::waitKey(0);
 
 	// TODO: implement skin smoothing
 
