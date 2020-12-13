@@ -17,7 +17,9 @@ int main(int argc, char *argv[])
 	{
 		// TODO: get images from the command line
 		Mat im = imread("./images/hillary_clinton.jpg", IMREAD_COLOR);
-		//Mat im = imread("./images/two.jpg", IMREAD_COLOR);
+		//Mat im = imread("./images/wrinkles_2.jpg", IMREAD_COLOR);
+		//Mat im = imread("./images/wrinkles_1.png", IMREAD_COLOR);
+		//Mat im = imread("./images/hopkins.jpg", IMREAD_COLOR);
 		imshow("test", im);
 		waitKey(0);
 
@@ -31,7 +33,7 @@ int main(int argc, char *argv[])
 		Mat out = app.applyFilter(im, FacialSkinSmoother{});
 		app.display(out);*/
 
-		FacialSkinSmoother filter{ 0.7f };
+		FacialSkinSmoother filter{ 0.7f, 3, 30.0, 30.0 };
 		Mat out = filter.apply(im);
 
 		imshow("Skin Smoothing", out);

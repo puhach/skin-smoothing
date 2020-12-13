@@ -74,26 +74,26 @@ void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 		cv::bitwise_or(mask, orMask, mask);
 	}
 
-	// Denoise the mask
+	// Denoise the mask	
+	cv::GaussianBlur(mask, mask, cv::Size(7, 7), 0, 0);
 	///cv::dilate(mask, mask, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3)));
 	//cv::morphologyEx(mask, mask, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3)));
 
-	cv::GaussianBlur(mask, mask, cv::Size(7, 7), 0, 0);
-
 	mask.convertTo(mask, CV_32F, 1 / 255.0);
 
-	cv::imshow("mask", mask);
-	cv::waitKey(0);
+	/*cv::imshow("mask", mask);
+	cv::waitKey(0);*/
 
 	// Blur the image using the edge-preserving filter
 	cv::Mat imageBlurredHSVF;
 	//cv::GaussianBlur(imageF, imageBlurredHSVF, cv::Size(5,5), 0, 0);
-	cv::bilateralFilter(imageF, imageBlurredHSVF, 8, 30, 30);
+	//cv::bilateralFilter(imageF, imageBlurredHSVF, 8, 30, 30);
+	cv::bilateralFilter(imageF, imageBlurredHSVF, 2*this->blurRadius, this->sigmaColor, this->sigmaSpace);
 
-	cv::Mat tmp; 
+	/*cv::Mat tmp; 
 	cv::cvtColor(imageBlurredHSVF, tmp, cv::COLOR_HSV2BGR);
 	cv::imshow("test", tmp);
-	cv::waitKey();
+	cv::waitKey();*/
 
 	
 	// Combine the blurred and the original part of the image, making a seamless transition between these regions
@@ -123,8 +123,8 @@ void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 	imageBlurredBGR.convertTo(image, CV_8UC3, 255.0);
 		*/
 
-	cv::imshow("blurred", image);
-	cv::waitKey(0);
+	/*cv::imshow("blurred", image);
+	cv::waitKey(0);*/
 }
 
 cv::Mat SkinSmoother::apply(const cv::Mat& image)	// virtual

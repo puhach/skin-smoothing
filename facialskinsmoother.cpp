@@ -7,9 +7,10 @@
 #include <opencv2/imgproc.hpp> // TEST!
 
 
-FacialSkinSmoother::FacialSkinSmoother(float confidenceThreshold)
-	: net(cv::dnn::readNetFromTensorflow("./models/opencv_face_detector_uint8.pb", "./models/opencv_face_detector.pbtxt"))
-	, confidenceThreshold(confidenceThreshold)
+FacialSkinSmoother::FacialSkinSmoother(float faceConfThreshold, int blurRadius, double sigmaColor, double sigmaSpace)
+	: SkinSmoother(blurRadius, sigmaColor, sigmaSpace)
+	, net(cv::dnn::readNetFromTensorflow("./models/opencv_face_detector_uint8.pb", "./models/opencv_face_detector.pbtxt"))
+	, confidenceThreshold(faceConfThreshold)
 {
 
 }
