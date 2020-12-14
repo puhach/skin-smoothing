@@ -14,7 +14,7 @@ class SkinSmoother : public ImageFilter
 {
 public:
 
-	SkinSmoother(SkinDetectionHeuristic heuristic, int blurRadius, double sigmaColor, double sigmaSpace)
+	constexpr SkinSmoother(SkinDetectionHeuristic heuristic, int blurRadius, double sigmaColor, double sigmaSpace) noexcept
 		: heuristic(heuristic)
 		, blurRadius(blurRadius)
 		, sigmaColor(sigmaColor)
