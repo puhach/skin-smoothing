@@ -21,6 +21,18 @@ public:
 		, sigmaSpace(sigmaSpace)
 	{}
 
+	constexpr SkinDetectionHeuristic getSkinDetectionHeuristic() const noexcept { return this->heuristic; }
+	constexpr void setSkinDetectionHeuristic(SkinDetectionHeuristic heuristic) noexcept { this->heuristic = heuristic; }
+
+	constexpr int getBlurRadius() const noexcept { return this->blurRadius; }
+	constexpr void setBlurRadius(int blurRadius) noexcept { this->blurRadius = blurRadius; }
+
+	constexpr double getSigmaColor() const noexcept { return this->sigmaColor; }
+	constexpr void setSigmaColor(double sigmaColor) noexcept { this->sigmaColor = sigmaColor; }
+
+	constexpr double getSigmaSpace() const noexcept { return this->sigmaSpace; }
+	constexpr void setSigmaSpace(double sigmaSpace) noexcept { this->sigmaSpace = sigmaSpace; }
+
 	virtual void applyInPlace(cv::Mat& image) override;
 
 	virtual cv::Mat apply(const cv::Mat& image) override;

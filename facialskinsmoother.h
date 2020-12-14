@@ -13,6 +13,10 @@ public:
 	//FacialSkinSmoother(const FacialSkinSmoother& other) = default;
 	//FacialSkinSmoother(FacialSkinSmoother&& other) = default;
 
+	// https://stackoverflow.com/questions/54575426/what-is-the-purpose-of-marking-the-set-function-setter-as-constexpr/54575507
+	constexpr float getFaceConfidenceThreshold() const noexcept { return this->confidenceThreshold; }
+	constexpr void setFaceConfidenceThreshold(float faceConfThreshold) noexcept { this->confidenceThreshold = faceConfThreshold; }
+
 	virtual void applyInPlace(cv::Mat &image) override;
 
 	virtual cv::Mat apply(const cv::Mat& image) override;
