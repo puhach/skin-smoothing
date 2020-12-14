@@ -10,31 +10,69 @@
 using namespace std;
 using namespace cv;
 
+
+void printUsage()
+{
+	cout << "Usage: skinsoft -image=<image file> "
+			"[-confidence=<float 0..1>] "
+			"[-radius=<integer>] "
+			"[-sigmac=<float>] "
+			"[-sigmas=<float>] "
+			"[-heuristic=<choice>]" << endl;
+}
+
 int main(int argc, char *argv[])
 {
 
+	static const String keys =
+		"{help h usage ? |      | Print the help message  }"
+		"{image          |<none>| The input image file  }"
+		"{confidence     |0.7   | Face detection confidence threshold }"
+		"{radius         |3     | Blur radius          }"
+		"{sigmac         |30    | Blur sigma in the color space }"
+		"{sigmas         |30    | Blur sigma in the coordinate space }"
+		"{heuristic      |2     | Skin detection heuristic: 1 - Mean color, 2 - Dominant color, 3 - Selective sampling }";
+
 	try
 	{
-		// TODO: get images from the command line
-		Mat im = imread("./images/hillary_clinton.jpg", IMREAD_COLOR);
+		CommandLineParser parser(argc, argv, keys);
+		parser.about("Facial Skin Smoother\n(c) Yaroslav Pugach");
+
+		if (parser.has("help"))
+		{
+			printUsage();
+			return 0;
+		}
+
+		String inputFile = parser.get<String>("image");
+		float faceConfThreshold = parser.get<float>("confidence");
+		int blurRadius = parser.get<int>("radius");
+		double sigmaColor = parser.get<double>("sigmac");
+		double sigmaSpace = parser.get<double>("sigmas");
+		int heuristicId = parser.get<int>("heuristic");
+		SkinDetectionHeuristic heuristic{ heuristicId-1 };
+
+		if (!parser.check())
+		{
+			parser.printErrors();
+			printUsage();
+			return -1;
+		}
+
+		//Mat im = imread("./images/hillary_clinton.jpg", IMREAD_COLOR);
 		//Mat im = imread("./images/wrinkles_2.jpg", IMREAD_COLOR);
 		//Mat im = imread("./images/wrinkles_1.png", IMREAD_COLOR);
 		//Mat im = imread("./images/hopkins.jpg", IMREAD_COLOR);
+		//Mat im = imread("./images/old_couple_1.jpg", IMREAD_COLOR);
 		//Mat im = imread("./images/old_couple_2.jpg", IMREAD_COLOR);
-		imshow("test", im);
+		Mat im = imread(inputFile, IMREAD_COLOR);
+		imshow("Original", im);
 		waitKey(0);
 
-		/*Beautifier beautifier;
-		beautifier.smoothSkin()*/
-
-		/*SelfieApp app;
-		app.smoothFacialSkin(im);*/
-
-		/*SelfieApp app("selfie app");
-		Mat out = app.applyFilter(im, FacialSkinSmoother{});
-		app.display(out);*/
-
-		FacialSkinSmoother filter{ 0.7f, SkinDetectionHeuristic::SelectiveSampling, 3, 30.0, 30.0 };
+		FacialSkinSmoother filter{ faceConfThreshold, heuristic, blurRadius, sigmaColor, sigmaSpace };
+		//FacialSkinSmoother filter{ 0.5f, SkinDetectionHeuristic::DominantColor, 3, 30.0, 30.0 };
+		//filter.setFaceConfidenceThreshold(0.5f);
+		//filter.setBlurRadius(5);
 		Mat out = filter.apply(im);
 
 		imshow("Skin Smoothing", out);
@@ -43,7 +81,7 @@ int main(int argc, char *argv[])
 	catch (std::exception& e)
 	{
 		cout << e.what() << endl;
-		return -1;
+		return -2;
 	}
 
 	return 0;
