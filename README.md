@@ -2,11 +2,11 @@
 
 This application implements an image filter for smoothing the skin of a face. There are three heuristics which can be used for skin detection:
 
-*Mean color* detects the skin by calculating the mean color of the face region.
+* *Mean color* detects the skin by calculating the mean color of the face region.
 
-*Dominant color* detects the skin by finding the dominant hue and saturation values in the face region
+* *Dominant color* detects the skin by finding the dominant hue and saturation values in the face region
 
-*Selective sampling* detects the skin by sampling colors from the forehead, chin, and cheeks regions.
+* *Selective sampling* detects the skin by sampling colors from the forehead, chin, and cheeks regions.
 It may be more accurate than other heuristics, but works well only for appropriately detected frontal faces with typical proportions.
 
 ![skin smoothing](./assets/hillary.jpg)
