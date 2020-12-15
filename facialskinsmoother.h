@@ -10,8 +10,6 @@ class FacialSkinSmoother : public SkinSmoother
 {
 public:
 	FacialSkinSmoother(float faceConfThreshold, SkinDetectionHeuristic heuristic, int blurRadius=3, double sigmaColor=30.0, double sigmaSpace=30.0);
-	//FacialSkinSmoother(const FacialSkinSmoother& other) = default;
-	//FacialSkinSmoother(FacialSkinSmoother&& other) = default;
 
 	// https://stackoverflow.com/questions/54575426/what-is-the-purpose-of-marking-the-set-function-setter-as-constexpr/54575507
 	constexpr float getFaceConfidenceThreshold() const noexcept { return this->confidenceThreshold; }

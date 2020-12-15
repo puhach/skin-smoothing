@@ -59,23 +59,14 @@ int main(int argc, char *argv[])
 			return -1;
 		}
 
-		//Mat im = imread("./images/hillary_clinton.jpg", IMREAD_COLOR);
-		//Mat im = imread("./images/wrinkles_2.jpg", IMREAD_COLOR);
-		//Mat im = imread("./images/wrinkles_1.png", IMREAD_COLOR);
-		//Mat im = imread("./images/hopkins.jpg", IMREAD_COLOR);
-		//Mat im = imread("./images/old_couple_1.jpg", IMREAD_COLOR);
-		//Mat im = imread("./images/old_couple_2.jpg", IMREAD_COLOR);
 		Mat im = imread(inputFile, IMREAD_COLOR);
 		imshow("Original", im);
 		waitKey(0);
 
 		FacialSkinSmoother filter{ faceConfThreshold, heuristic, blurRadius, sigmaColor, sigmaSpace };
-		//FacialSkinSmoother filter{ 0.5f, SkinDetectionHeuristic::DominantColor, 3, 30.0, 30.0 };
-		//filter.setFaceConfidenceThreshold(0.5f);
-		//filter.setBlurRadius(5);
 		Mat out = filter.apply(im);
 
-		imshow("Skin Smoothing", out);
+		imshow("Output", out);
 		waitKey(0);
 	} // try
 	catch (std::exception& e)

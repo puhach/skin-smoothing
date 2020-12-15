@@ -5,9 +5,6 @@
 
 void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 {
-	//cv::imshow("face", image);
-	//cv::waitKey();
-
 	// If you use cvtColor with 8-bit images, the conversion will have some information lost. For many applications, this will not be noticeable 
 	// but it is recommended to use 32-bit images in applications that need the full range of colors or that convert an image before an operation 
 	// and then convert back.
@@ -48,7 +45,6 @@ void SkinSmoother::applyInPlace(cv::Mat& image)	// virtual
 	// Blur the image using the edge-preserving filter
 	cv::Mat imageBlurredHSVF;
 	//cv::GaussianBlur(imageF, imageBlurredHSVF, cv::Size(5,5), 0, 0);
-	//cv::bilateralFilter(imageF, imageBlurredHSVF, 8, 30, 30);
 	cv::bilateralFilter(imageF, imageBlurredHSVF, 2*this->blurRadius, this->sigmaColor, this->sigmaSpace);
 
 	
