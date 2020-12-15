@@ -9,6 +9,8 @@ This application implements an image filter for smoothing the skin of a face. Th
 *Selective sampling* detects the skin by sampling colors from the forehead, chin, and cheeks regions.
 It may be more accurate than other heuristics, but works well only for appropriately detected frontal faces with typical proportions.
 
+![skin smoothing](./assets/hillary.jpg)
+
 ## Set Up
 
 It is assumed that OpenCV 4.x, C++17 compiler, and cmake 2.18.12 or newer are installed on the system.
