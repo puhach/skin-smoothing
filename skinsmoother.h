@@ -21,6 +21,10 @@ public:
 		, sigmaSpace(sigmaSpace)
 	{}
 
+	// An object can be modified in an constexpr context provided that the modifications are constexpr
+	// (constexpr member functions are not const member functions since C++14)
+	// https://stackoverflow.com/questions/54575426/what-is-the-purpose-of-marking-the-set-function-setter-as-constexpr/54575507
+
 	constexpr SkinDetectionHeuristic getSkinDetectionHeuristic() const noexcept { return this->heuristic; }
 	constexpr void setSkinDetectionHeuristic(SkinDetectionHeuristic heuristic) noexcept { this->heuristic = heuristic; }
 

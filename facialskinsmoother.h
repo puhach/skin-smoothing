@@ -11,9 +11,12 @@ class FacialSkinSmoother : public SkinSmoother
 public:
 	FacialSkinSmoother(float faceConfThreshold, SkinDetectionHeuristic heuristic, int blurRadius=3, double sigmaColor=30.0, double sigmaSpace=30.0);
 
-	// https://stackoverflow.com/questions/54575426/what-is-the-purpose-of-marking-the-set-function-setter-as-constexpr/54575507
-	constexpr float getFaceConfidenceThreshold() const noexcept { return this->confidenceThreshold; }
-	constexpr void setFaceConfidenceThreshold(float faceConfThreshold) noexcept { this->confidenceThreshold = faceConfThreshold; }
+	// For a constexpr function or constexpr constructor that is neither defaulted nor a template, if no argument values exist such that 
+	// an invocation of the function or constructor could be an evaluated subexpression of a core constant expression, or, for a constructor, 
+	// a constant initializer for some object, the program is ill - formed; no diagnostic required
+	// https://stackoverflow.com/questions/40322579/constexpr-member-function-of-non-constexpr-constructible-class	
+	float getFaceConfidenceThreshold() const noexcept { return this->confidenceThreshold; }
+	void setFaceConfidenceThreshold(float faceConfThreshold) noexcept { this->confidenceThreshold = faceConfThreshold; }
 
 	virtual void applyInPlace(cv::Mat &image) override;
 
